@@ -9,12 +9,41 @@ class PokeSQLBuilder:
     
     def populate_type(self, types):
         values = []
+        type_affinities = {
+            'half_damage_to' : [],
+            'double_damage_to' : [],
+            'no_damage_to' : [],
+        }
+        
         for type_id in types:
+            
             pokemon_type = types[type_id]
             values.append([pokemon_type["id"], pokemon_type["name"]]);
+            
+            for relation_id in pokemon_type["damage_relations"]:
+                
+                relations = pokemon_type["damage_relations"][relation_id]
+                
+                if relation_id in type_affinities:
+                    
+                    for type_to in relations:
+                        type_affinities[relation_id].append([pokemon_type["id"],types[type_to["name"]]["id"]])
+                    
+        
+        print(str(type_affinities))
         
         self.__insert_into("type", ["id","name"], values)
-            
+        
+        
+        tables_affinity = {
+            "double_damage_to" : "double_damage",
+            "half_damage_to" : "half_damage",
+            "no_damage_to" : "no_damage",
+        }
+        
+        for type_affinity in type_affinities:
+            self.__insert_into(tables_affinity[type_affinity], ["type_from", "type_to"], type_affinities[type_affinity])
+
         
     
     
@@ -131,7 +160,7 @@ class PokeSQLBuilder:
         
         #ZERO_DAMAGE
         self.__create_table(
-        "zero_damage", 
+        "no_damage", 
         [
             {
                 "name" : "type_from",
