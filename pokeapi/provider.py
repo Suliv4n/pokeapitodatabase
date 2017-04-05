@@ -1,5 +1,7 @@
 import urllib.request
 import json
+from _md5 import md5
+import os.path
 
 class PokeapiProvider:
     
@@ -10,9 +12,25 @@ class PokeapiProvider:
     
     def __call(self, url):
         print("Call : " + url)
-        request = urllib.request.Request(url=url, headers={'User-Agent': self.__user_agent})
-        handler = urllib.request.urlopen(request)
-        response = handler.read().decode("utf-8")
+        
+        if not os.path.exists("cache"):
+            os.makedirs("cache")
+        
+        cache_name = "cache/"+ md5(url.encode("utf-8")).hexdigest()
+        
+        response = ""
+        if not os.path.isfile(cache_name):
+            request = urllib.request.Request(url=url, headers={'User-Agent': self.__user_agent})
+            handler = urllib.request.urlopen(request)
+            response = handler.read().decode("utf-8")
+        
+            with open(cache_name, "w") as cache:
+                cache.write(response)
+        
+        else:
+            with open(cache_name, "r") as cache:
+                response = cache.read()
+            
         
         return json.loads(response)
     
