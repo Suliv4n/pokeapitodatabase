@@ -1,5 +1,4 @@
 import MySQLdb
-from model import pokemon_type
 
 class PokeSQLBuilder:
     
@@ -46,6 +45,13 @@ class PokeSQLBuilder:
 
         
     
+    def populate_ability(self, abilities):
+        to_insert = []
+        for key in abilities:
+            ability = abilities[key]
+            to_insert.append([ability["id"], ability["name"], ability["flavor_text"]])
+    
+        self.__insert_into("ability", ["id", "name", "flavor_text"], to_insert)
     
     def __insert_into(self, table, columns, values):
         sql = "insert into " + table + "( " + ",".join(columns) + ") values"
@@ -80,16 +86,17 @@ class PokeSQLBuilder:
         if len(foreign_keys):
             
             for key in foreign_keys:
-                sql += "constraint " + key["name"] + " foreign key (" + key["from"] + ") references " + key["table"] + "(" + key["column"] + "),"
+                sql += "constraint " + key["name"] + " foreign key (" + key["from"] + ") references " + key["table"] + "(" + key["column"] + ") on delete cascade,"
 
         sql = sql[:-1]
         
         sql += ")"
         
+        
         print(sql)
         
         self.__connection.query(sql)
-
+        self.__connection.query("delete from " + name)
 
     def build_data_base(self):
         #TYPE
@@ -182,3 +189,22 @@ class PokeSQLBuilder:
             },
         ]    
         )
+        
+        #ABILTY
+        self.__create_table("ability", [
+            {
+                "name" : "id",
+                "type" : "int",
+                "options" : "not null primary key"
+            },
+            {
+                "name" : "name",
+                "type" : "varchar(64)",
+                "options" : "not null",
+            },
+            {
+                "name" : "flavor_text",
+                "type" : "varchar(255)",
+            }
+            
+        ])

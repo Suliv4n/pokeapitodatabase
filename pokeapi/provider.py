@@ -57,3 +57,33 @@ class PokeapiProvider:
             }
         
         return types
+    
+    def get_abilities(self):
+        abilities = {}
+        
+        for i in range(1,10):
+            ability = self.get("ability", i)
+            
+            ability_name = ""
+            for name in ability["names"]:
+                if name["language"]["name"] == "fr":
+                    ability_name = name["name"]
+                    break
+            
+            #est ce que je dois prendre en compte le version group ???
+            #on va dire que non
+            ability_text = ""
+            for text in ability["flavor_text_entries"]:
+                if text["language"]["name"] == "fr":
+                    ability_text = text["flavor_text"]
+                    break
+            
+            
+            abilities[ability["name"]] = {
+                "name" : ability_name,
+                "id" : ability["id"],
+                "flavor_text" : ability_text,
+            }
+        
+        return abilities
+        
