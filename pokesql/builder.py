@@ -59,13 +59,26 @@ class PokeSQLBuilder:
             values.append([egg_groups[egg_group]["id"], egg_groups[egg_group]["name"]])
             
         self.__insert_into("egg_group", ["id", "name"], values)
+        
+    def populate_stats(self, stats):
+        values = []
+        
+        for stat in stats:
+            stat = stats[stat]
+            values.append([
+                stat["id"],
+                stat["name"],
+                stat["battle_only"]
+            ])
+            
+        self.__insert_into("stat", ["id", "name", "battle_only"], values)
     
     def __insert_into(self, table, columns, values):
         sql = "insert into " + table + "( " + ",".join(columns) + ") values"
         
         for value in values:
             
-            sql += "("  + ",".join("\"" + str(x) + "\"" for x in value) + "),"
+            sql += "("  + ",".join("\"" + str(x) + "\"" if type(x) is str else str(x) for x in value) + "),"
         
         sql = sql[:-1]
         
@@ -226,5 +239,23 @@ class PokeSQLBuilder:
                 "name" : "name",
                 "type" : "varchar(64)",
                 "options" : "not null",
+            },
+        ])
+        
+        #STAT
+        self.__create_table("stat", [
+            {
+                "name" : "id",
+                "type" : "int",
+                "options" : "not null primary key"
+            },
+            {
+                "name" : "name",
+                "type" : "varchar(64)",
+                "options" : "not null",
+            },
+            {
+                "name" : "battle_only",
+                "type" : "boolean",
             },
         ])

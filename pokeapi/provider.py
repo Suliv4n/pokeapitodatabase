@@ -91,3 +91,17 @@ class PokeapiProvider:
         
         
         return egg_groups
+    
+    def get_stats(self):
+        stats = {}
+        
+        for i in range(1,9):
+            stat = self.get("stat", i)
+            
+            stats[stat["name"]] = {
+                "id" : stat["id"],
+                "name" : self.__get_language(stat["names"], "name", "fr"),
+                "battle_only" : stat["is_battle_only"],
+            }
+        
+        return stats

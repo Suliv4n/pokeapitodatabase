@@ -28,3 +28,7 @@ builder.populate_ability(abilities)
 print("Populating egg_group table...")
 egg_groups = provider.get_egg_groups()
 builder.populate_egg_groups(egg_groups)
+
+print("Populating stats table...")
+stats = provider.get_stats()
+builder.populate_stats(stats)
