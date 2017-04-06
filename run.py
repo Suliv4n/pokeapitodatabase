@@ -20,3 +20,11 @@ print("Database built !")
 print("Populating type table and references...")
 types = provider.get_types()
 builder.populate_type(types)
+
+print("Populating ability table...")
+abilities = provider.get_abilities()
+builder.populate_ability(abilities)
+
+print("Populating egg_group table...")
+egg_groups = provider.get_egg_groups()
+builder.populate_egg_groups(egg_groups)

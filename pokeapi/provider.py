@@ -34,7 +34,14 @@ class PokeapiProvider:
         
         return json.loads(response)
     
-    
+    def __get_language(self, languages, field, lang):
+        text = ""
+        for languages in languages:
+            if languages["language"]["name"] == lang:
+                text = languages[field]
+                break
+        return text        
+        
     def get(self, what, api_id):
         return self.__call(self.__url % (what, api_id))
     
@@ -44,15 +51,10 @@ class PokeapiProvider:
         for i in range(1,19):
             pokemon_type = self.get("type", i)
             
-
-            for lang in pokemon_type["names"]:
-                if lang["language"]["name"] == "fr":
-                    name = lang["name"]
-                    break
             
             types[pokemon_type["name"]] = {
                 "id" : i,
-                "name" : name,
+                "name" : self.__get_language(pokemon_type["names"], "name", "fr"),
                 "damage_relations" : pokemon_type["damage_relations"]
             }
         
@@ -61,29 +63,31 @@ class PokeapiProvider:
     def get_abilities(self):
         abilities = {}
         
-        for i in range(1,10):
+        for i in range(1,192):
             ability = self.get("ability", i)
             
-            ability_name = ""
-            for name in ability["names"]:
-                if name["language"]["name"] == "fr":
-                    ability_name = name["name"]
-                    break
             
             #est ce que je dois prendre en compte le version group ???
             #on va dire que non
-            ability_text = ""
-            for text in ability["flavor_text_entries"]:
-                if text["language"]["name"] == "fr":
-                    ability_text = text["flavor_text"]
-                    break
-            
             
             abilities[ability["name"]] = {
-                "name" : ability_name,
+                "name" : self.__get_language(ability["names"], "name", "fr"),
                 "id" : ability["id"],
-                "flavor_text" : ability_text,
+                "flavor_text" : self.__get_language(ability["flavor_text_entries"], "flavor_text", "fr"),
             }
         
         return abilities
         
+    def get_egg_groups(self):
+        egg_groups = {}
+        
+        for i in range (1,16):
+            
+            egg_group = self.get("egg-group", i)
+            egg_groups[egg_group["name"]] = {
+                "id" : egg_group["id"],
+                "name" : self.__get_language(egg_group["names"], "name", "fr"),
+            }
+        
+        
+        return egg_groups

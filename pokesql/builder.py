@@ -46,12 +46,19 @@ class PokeSQLBuilder:
         
     
     def populate_ability(self, abilities):
-        to_insert = []
+        values = []
         for key in abilities:
             ability = abilities[key]
-            to_insert.append([ability["id"], ability["name"], ability["flavor_text"]])
+            values.append([ability["id"], ability["name"], ability["flavor_text"]])
     
-        self.__insert_into("ability", ["id", "name", "flavor_text"], to_insert)
+        self.__insert_into("ability", ["id", "name", "flavor_text"], values)
+    
+    def populate_egg_groups(self, egg_groups):
+        values = []
+        for egg_group in egg_groups:
+            values.append([egg_groups[egg_group]["id"], egg_groups[egg_group]["name"]])
+            
+        self.__insert_into("egg_group", ["id", "name"], values)
     
     def __insert_into(self, table, columns, values):
         sql = "insert into " + table + "( " + ",".join(columns) + ") values"
@@ -205,6 +212,19 @@ class PokeSQLBuilder:
             {
                 "name" : "flavor_text",
                 "type" : "varchar(255)",
-            }
-            
+            },
+        ])
+        
+        #EGG_GROUP
+        self.__create_table("egg_group", [
+            {
+                "name" : "id",
+                "type" : "int",
+                "options" : "not null primary key"
+            },
+            {
+                "name" : "name",
+                "type" : "varchar(64)",
+                "options" : "not null",
+            },
         ])
