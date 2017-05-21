@@ -100,6 +100,25 @@ class PokeSQLBuilder:
                    pkm_type["slot"],
                 ])
         self.__insert_into("pokemon_type", ["pokemon_id", "type_id", "slot"], values)
+        
+    def populate_pokemon_stat(self, pokemons, stats):
+        values = []
+        
+        for pokemon in pokemons:
+            pokemon = pokemons[pokemon]
+            pokemon_id = pokemon["id"]
+            
+            for pkm_stat in pokemon["stats"]:
+
+                stat_id = stats[pkm_stat["stat"]["name"]]["id"]
+
+                values.append([
+                    pokemon_id,
+                    stat_id,
+                    pkm_stat["base_stat"]
+                ])
+        
+        self.__insert_into("pokemon_stat", ["pokemon_id", "stat_id", "value"], values)
     
     def __insert_into(self, table, columns, values):
         sql = "insert into " + table + "( " + ",".join(columns) + ") values"
@@ -347,5 +366,33 @@ class PokeSQLBuilder:
                 "type" : "int",
                 "options" : "not null"
             },
-        ],
-        )
+        ])
+        
+        #POKEMON_STAT
+        self.__create_table("pokemon_stat", [
+            {
+                "name" : "pokemon_id",
+                "type" : "int",
+                "options" : "not null",
+                "reference" : {
+                    "table" : "pokemon",
+                    "column" : "id",
+                },
+                "primary_key" : True,
+            },
+            {
+                "name" : "stat_id",
+                "type" : "int",
+                "options" : "not null",
+                "reference" : {
+                    "table" : "stat",
+                    "column" : "id",
+                },
+                "primary_key" : True,
+            },
+            {
+                "name" : "value",
+                "type" : "int",
+                "options" : "not null",
+            }
+        ]);
