@@ -105,3 +105,20 @@ class PokeapiProvider:
             }
         
         return stats
+    
+    def get_pokemon(self):
+        pokemons = {}
+        
+        for i in range(1,722):
+            pokemon_spece = self.get("pokemon-species", i)
+            pokemon = self.get("pokemon", i)
+            
+            pokemons[pokemon_spece["id"]] = {
+                "id" : pokemon_spece["id"],
+                "name" : self.__get_language(pokemon_spece["names"], "name", "fr"),
+                "types" : pokemon["types"],
+                "stats" : pokemon["stats"],
+            }
+            
+        return pokemons
+        

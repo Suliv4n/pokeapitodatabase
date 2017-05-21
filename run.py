@@ -32,3 +32,8 @@ builder.populate_egg_groups(egg_groups)
 print("Populating stats table...")
 stats = provider.get_stats()
 builder.populate_stats(stats)
+
+print("Populating pokemon table...")
+pokemons = provider.get_pokemon()
+builder.populate_pokemon(pokemons)
+builder.populate_pokemon_type(pokemons, types)

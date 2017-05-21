@@ -72,6 +72,34 @@ class PokeSQLBuilder:
             ])
             
         self.__insert_into("stat", ["id", "name", "battle_only"], values)
+        
+    def populate_pokemon(self, pokemons):
+        values = []
+        
+        for pokemon in pokemons:
+            pokemon = pokemons[pokemon]
+            values.append([
+                pokemon["id"],
+                pokemon["name"]
+            ])
+            
+        self.__insert_into("pokemon", ["id", "name"], values)
+        
+    def populate_pokemon_type(self, pokemons, types):
+        values = []
+        
+        for pokemon in pokemons:
+            pokemon = pokemons[pokemon]
+            pokemon_id = pokemon["id"]
+            
+            for pkm_type in pokemon["types"]:
+                type_id = types[pkm_type["type"]["name"]]["id"]
+                values.append([
+                   pokemon_id,
+                   type_id,
+                   pkm_type["slot"],
+                ])
+        self.__insert_into("pokemon_type", ["pokemon_id", "type_id", "slot"], values)
     
     def __insert_into(self, table, columns, values):
         sql = "insert into " + table + "( " + ",".join(columns) + ") values"
@@ -91,6 +119,7 @@ class PokeSQLBuilder:
         sql = "create table if not exists " + name + " ("
         
         foreign_keys = []
+        primary_key = []
         
         for column in columns:
             sql += column["name"] + " " + column["type"] + " "
@@ -102,6 +131,12 @@ class PokeSQLBuilder:
             if "reference" in column:
                 fk_name = "FK_"+name+"_"+column["name"]+"__"+column["reference"]["table"]+"_"+column["reference"]["column"]
                 foreign_keys.append({"name" : fk_name, "table" : column["reference"]["table"], "column": column["reference"]["column"] , "from" : column["name"]})
+                
+            if "primary_key" in column and column["primary_key"]:
+                primary_key.append(column["name"])
+            
+        if len(primary_key):
+            sql += "primary key (" + ",".join(primary_key) + "),"
             
         if len(foreign_keys):
             
@@ -126,7 +161,8 @@ class PokeSQLBuilder:
             {
                 "name" : "id",
                 "type" : "int",
-                "options" : "not null primary key"
+                "options" : "not null",
+                "primary_key" : True,
             },
             {
                 "name" : "name", 
@@ -146,7 +182,8 @@ class PokeSQLBuilder:
                 "reference" : {
                     "table" : "type",
                     "column" : "id",
-                }
+                },
+                "primary_key" : True,
             },
             {
                 "name" : "type_to",
@@ -155,7 +192,8 @@ class PokeSQLBuilder:
                 "reference" : {
                     "table" : "type",
                     "column" : "id",
-                }
+                },
+                "primary_key" : True,
             },
         ]        
         )
@@ -171,16 +209,18 @@ class PokeSQLBuilder:
                 "reference" : {
                     "table" : "type",
                     "column" : "id",
-                }
+                },
+                "primary_key" : True,
             },
             {
                 "name" : "type_to",
                 "type" : "int",
-                "options" : "not null",
+                "options" : "not null primary key",
                 "reference" : {
                     "table" : "type",
                     "column" : "id",
-                }
+                },
+                "primary_key" : True,
             },
         ]        
         )
@@ -196,7 +236,8 @@ class PokeSQLBuilder:
                 "reference" : {
                     "table" : "type",
                     "column" : "id",
-                }
+                },
+                "primary_key" : True,
             },
             {
                 "name" : "type_to",
@@ -205,7 +246,8 @@ class PokeSQLBuilder:
                 "reference" : {
                     "table" : "type",
                     "column" : "id",
-                }
+                },
+                "primary_key" : True,
             },
         ]    
         )
@@ -215,7 +257,8 @@ class PokeSQLBuilder:
             {
                 "name" : "id",
                 "type" : "int",
-                "options" : "not null primary key"
+                "options" : "not null",
+                "primary_key" : True,
             },
             {
                 "name" : "name",
@@ -233,7 +276,8 @@ class PokeSQLBuilder:
             {
                 "name" : "id",
                 "type" : "int",
-                "options" : "not null primary key"
+                "options" : "not null",
+                "primary_key" : True,
             },
             {
                 "name" : "name",
@@ -247,7 +291,8 @@ class PokeSQLBuilder:
             {
                 "name" : "id",
                 "type" : "int",
-                "options" : "not null primary key"
+                "options" : "not null",
+                "primary_key" : True,
             },
             {
                 "name" : "name",
@@ -259,3 +304,48 @@ class PokeSQLBuilder:
                 "type" : "boolean",
             },
         ])
+        
+        #POKEMON 
+        self.__create_table("pokemon", [
+            {
+                "name" : "id",
+                "type" : "int",
+                "options" : "not null",
+                "primary_key" : True,
+            },
+            {
+                "name" : "name",
+                "type" : "varchar(255)",
+                "options" : "not null",
+            },
+        ])
+        
+        #POKEMON_TYPE
+        self.__create_table("pokemon_type", [
+            {
+                "name" : "pokemon_id",
+                "type" : "int",
+                "options" : "not null",
+                "reference" : {
+                    "table" : "pokemon",
+                    "column" : "id",
+                },
+                "primary_key" : True,
+            },
+            {
+                "name" : "type_id",
+                "type" : "int",
+                "options" : "not null",
+                "reference" : {
+                    "table" : "type",
+                    "column" : "id",
+                },
+                "primary_key" : True,
+            },
+            {
+                "name" : "slot",
+                "type" : "int",
+                "options" : "not null"
+            },
+        ],
+        )
