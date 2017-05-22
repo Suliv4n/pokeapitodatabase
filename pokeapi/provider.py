@@ -1,5 +1,6 @@
 import urllib.request
 import json
+import itertools
 from _md5 import md5
 import os.path
 
@@ -109,9 +110,10 @@ class PokeapiProvider:
     def get_pokemon(self):
         pokemons = {}
         
-        for i in range(1,722):
-            pokemon_spece = self.get("pokemon-species", i)
+        for i in itertools.chain(range(1,722), range(10001,10091)):
             pokemon = self.get("pokemon", i)
+            pokemon_spece = self.get("pokemon-species", pokemon["species"]["name"])
+            
             
             pokemons[pokemon_spece["id"]] = {
                 "id" : pokemon_spece["id"],
