@@ -115,9 +115,9 @@ class PokeapiProvider:
             pokemon_spece = self.get("pokemon-species", pokemon["species"]["name"])
             
             
-            pokemons[pokemon_spece["id"]] = {
-                "id" : pokemon_spece["id"],
-                "name" : self.__get_language(pokemon_spece["names"], "name", "fr"),
+            pokemons[pokemon["id"]] = {
+                "id" : pokemon["id"],
+                "name" : self.__get_language(pokemon["names"], "name", "fr"),
                 "types" : pokemon["types"],
                 "stats" : pokemon["stats"],
             }
